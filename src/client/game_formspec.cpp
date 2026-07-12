@@ -377,81 +377,62 @@ void GameFormSpec::showPauseMenu()
 
 	auto simple_singleplayer_mode = m_client->m_simple_singleplayer_mode;
 
-	float ypos = simple_singleplayer_mode ? 0.7f : 0.1f;
 	std::ostringstream os;
 
+	// Bedrock-style "Game Menu": a centered vertical stack of flat buttons with
+	// a bright green "Resume Game" primary button.
+	const float bx = 3.25f, bw = 4.5f, bh = 0.65f, dy = 0.76f;
+	float ypos = 0.85f;
+
 	os << "formspec_version[1]" << SIZE_TAG
-		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_continue;"
+		<< "style_type[button;border=false;bgcolor=#5a5a5aff;bgcolor_hovered=#6d6d6dff;bgcolor_pressed=#474747ff;textcolor=#ffffff]"
+		<< "style[btn_continue;border=false;bgcolor=#3fa93fff;bgcolor_hovered=#4fc44fff;bgcolor_pressed=#2f8f2fff;textcolor=#ffffff]"
+		// TRANSLATORS: In-game pause menu title
+		<< "label[4.9,0.4;" << strgettext("Game Menu") << "]";
+
+	os << "button_exit[" << bx << "," << ypos << ";" << bw << "," << bh
 		// TRANSLATORS: Pause menu button, try to keep the translation short
-		<< strgettext("Resume Game") << "]";
+		<< ";btn_continue;" << strgettext("Resume Game") << "]";
+	ypos += dy;
 
 	if (!simple_singleplayer_mode) {
-		os << "button[4," << (ypos++) << ";3,0.5;btn_change_password;"
+		os << "button[" << bx << "," << ypos << ";" << bw << "," << bh
 			// TRANSLATORS: Pause menu button, try to keep the translation short
-			<< strgettext("Change Password") << "]";
-	} else {
-		os << "field[4.95,0;5,1.5;;" << strgettext("Game paused") << ";]";
+			<< ";btn_change_password;" << strgettext("Change Password") << "]";
+		ypos += dy;
 	}
 
-	os	<< "button[4," << (ypos++) << ";3,0.5;btn_settings;"
+	os << "button[" << bx << "," << ypos << ";" << bw << "," << bh
 		// TRANSLATORS: Try to keep the translation short
-		<< strgettext("Settings") << "]";
+		<< ";btn_settings;" << strgettext("Settings") << "]";
+	ypos += dy;
 
 #ifndef __ANDROID__
 #if USE_SOUND
-	os << "button[4," << (ypos++) << ";3,0.5;btn_sound;"
+	os << "button[" << bx << "," << ypos << ";" << bw << "," << bh
 		// TRANSLATORS: Pause menu button, try to keep the translation short
-		<< strgettext("Sound Volume") << "]";
+		<< ";btn_sound;" << strgettext("Sound Volume") << "]";
+	ypos += dy;
 #endif
 #endif
 
-	os		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_exit_menu;"
+	os << "button_exit[" << bx << "," << ypos << ";" << bw << "," << bh
 		// TRANSLATORS: Pause menu button, try to keep the translation short
-		<< strgettext("Quit to Title") << "]";
-	os		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_exit_os;"
-		// TRANSLATORS: Pause menu button, try to keep the translation short (OS = Operating System)
-		<< strgettext("Quit Game")   << "]";
+		<< ";btn_exit_menu;" << strgettext("Quit to Title") << "]";
+	ypos += dy;
+
+	os << "button_exit[" << bx << "," << ypos << ";" << bw << "," << bh
+		// TRANSLATORS: Pause menu button, keep it short (OS = Operating System)
+		<< ";btn_exit_os;" << strgettext("Quit Game") << "]";
+	ypos += dy;
+
+	// Touch controls help (only shown on touchscreen).
 	if (!control_text.empty()) {
-	os		<< "textarea[7.5,0.25;3.9,6.25;;" << control_text << ";]";
+		os << "textarea[8.4,0.5;2.5,4.6;;;" << control_text << "]";
 	}
-	os		<< "textarea[0.4,0.25;3.9,6.25;;" << PROJECT_NAME_C " " VERSION_STRING "\n"
-		<< "\n"
-		<<  strgettext("Game info:") << "\n";
-	const std::string &address = m_client->getAddressName();
-	// TRANSLATORS: Game mode (server or singleplayer)
-	os << strgettext("- Mode: ");
-	if (!simple_singleplayer_mode) {
-		if (address.empty())
-			os << strgettext("Hosting server");
-		else
-			os << strgettext("Remote server");
-	} else {
-		os << strgettext("Singleplayer");
-	}
-	os << "\n";
-	if (simple_singleplayer_mode || address.empty()) {
-		static const std::string on = strgettext("On");
-		static const std::string off = strgettext("Off");
-		// Note: Status of enable_damage and creative_mode settings is intentionally
-		// NOT shown here because the game might roll its own damage system and/or do
-		// a per-player Creative Mode, in which case writing it here would mislead.
-		bool damage = g_settings->getBool("enable_damage");
-		const std::string &announced = g_settings->getBool("server_announce") ? on : off;
-		if (!simple_singleplayer_mode) {
-			if (damage) {
-				const std::string &pvp = g_settings->getBool("enable_pvp") ? on : off;
-				// TRANSLATORS: PvP = Player versus Player
-				os << strgettext("- PvP: ") << pvp << "\n";
-			}
-			os << strgettext("- Public: ") << announced << "\n";
-			std::string server_name = g_settings->get("server_name");
-			str_formspec_escape(server_name);
-			if (announced == on && !server_name.empty())
-				os << strgettext("- Server Name: ") << server_name;
 
-		}
-	}
-	os << ";]";
+	// Version label, bottom-left.
+	os << "label[0.3,5.2;" << PROJECT_NAME_C " " VERSION_STRING << "]";
 
 	/* Create menu */
 	/* Note: FormspecFormSource and LocalFormspecHandler  *

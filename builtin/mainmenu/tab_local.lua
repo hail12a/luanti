@@ -163,7 +163,11 @@ local function get_formspec(tabview, name, tabdata)
 			"button[5.25,", button_y, ";5,1.2;game_open_cdb;", fgettext("Install a game"), "]"})
 	end
 
-	local retval = ""
+	-- Bedrock-style flat button theming: neutral grey buttons with a bright
+	-- green primary "Play" button, applied to the whole Start Game screen.
+	local retval =
+		"style_type[button;border=false;bgcolor=#5a5a5aff;bgcolor_hovered=#6d6d6dff;bgcolor_pressed=#474747ff;textcolor=#ffffff]" ..
+		"style[play;border=false;bgcolor=#3fa93fff;bgcolor_hovered=#4fc44fff;bgcolor_pressed=#2f8f2fff;textcolor=#ffffff]"
 
 	local index = core.get_textlist_index("sp_worlds") or filterlist.get_current_index(menudata.worldlist,
 				tonumber(core.settings:get("mainmenu_last_selected_world"))) or 0
@@ -205,30 +209,37 @@ local function get_formspec(tabview, name, tabdata)
 		end
 	end
 
-	retval = retval .. "container[5.25,4.875]"
-	if world then
-		retval = retval ..
-				"button[0,0;3.225,0.8;world_delete;".. fgettext("Delete") .. "]" ..
-				"button[3.325,0;3.225,0.8;world_configure;".. fgettext("Select Mods") .. "]"
-	end
+	-- Left column: world options (Creative / Damage / Host Server).
+	-- In host mode the server fields are added below (second container).
 	retval = retval ..
-			"button[6.65,0;3.225,0.8;world_create;".. fgettext("New") .. "]" ..
-			"container_end[]" ..
 			"container[0.375,0.375]" ..
 			creative ..
 			damage ..
 			host ..
-			"container_end[]" ..
-			"container[5.25,0.375]" ..
-			"label[0,0.2;".. fgettext("Select World:") .. "]"..
-			"textlist[0,0.5;9.875,3.9;sp_worlds;" ..
+			"container_end[]"
+
+	-- The world list is the hero of the screen (Bedrock "Worlds" style).
+	retval = retval ..
+			"label[5.0,0.35;".. fgettext("Select World:") .. "]" ..
+			"textlist[5.0,0.8;10.125,4.2;sp_worlds;" ..
 			menu_render_worldlist() ..
-			";" .. index .. "]" ..
+			";" .. index .. "]"
+
+	-- World action buttons sit directly under the list.
+	retval = retval .. "container[5.0,5.15]"
+	if world then
+		retval = retval ..
+				"button[0,0;3.2,0.75;world_delete;".. fgettext("Delete") .. "]" ..
+				"button[3.35,0;3.2,0.75;world_configure;".. fgettext("Select Mods") .. "]"
+	end
+	retval = retval ..
+			"button[6.725,0;3.4,0.75;world_create;".. fgettext("New") .. "]" ..
 			"container_end[]"
 
 	if core.settings:get_bool("enable_server") and disabled_settings["enable_server"] == nil then
+		-- Big green primary button spanning the bottom (Bedrock-style).
 		retval = retval ..
-				"button[10.1875,5.925;4.9375,0.8;play;".. fgettext("Host Game") .. "]" ..
+				"button[5.0,6.05;10.125,0.9;play;".. fgettext("Host Game") .. "]" ..
 				"container[0.375,0.375]" ..
 				"checkbox[0,"..y..";cb_server_announce;" .. fgettext("Announce Server") .. ";" ..
 				dump(core.settings:get_bool("server_announce")) .. "]"
@@ -262,8 +273,9 @@ local function get_formspec(tabview, name, tabdata)
 
 		retval = retval .. "container_end[]"
 	elseif world then
+		-- Big green primary button spanning the bottom (Bedrock-style).
 		retval = retval ..
-				"button[10.1875,5.925;4.9375,0.8;play;" .. fgettext("Play Game") .. "]"
+				"button[5.0,6.05;10.125,0.9;play;" .. fgettext("Play Game") .. "]"
 	end
 
 	return retval
