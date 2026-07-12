@@ -1,0 +1,306 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Luanti textdomain mobs_mc x.x.x\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"X-Generator: mtt_convert 0.1.1\n"
+
+msgid "Axolotl"
+msgstr "Axolotl"
+
+msgid "Bat"
+msgstr "Chauve-souris"
+
+msgid "Blaze"
+msgstr "Blaze"
+
+msgid "Chicken"
+msgstr "Poule"
+
+msgid "Cod"
+msgstr "Morue"
+
+msgid "Cow"
+msgstr "Vache"
+
+msgid "Mooshroom"
+msgstr "Champimeuh"
+
+msgid "Creeper"
+msgstr "Creeper"
+
+msgid "Charged Creeper"
+msgstr "Creeper chargé"
+
+msgid "Dolphin"
+msgstr "Dauphin"
+
+msgid "Ender Dragon"
+msgstr "Ender Dragon"
+
+msgid "Enderman"
+msgstr "Enderman"
+
+msgid "Endermite"
+msgstr "Endermite"
+
+msgid "Ghast"
+msgstr "Ghast"
+
+msgid "Ghast Fireball"
+msgstr "Boule de feu de Ghast"
+
+msgid "Guardian"
+msgstr "Gardien"
+
+msgid "Elder Guardian"
+msgstr "Gardien de l'Elder"
+
+msgid "Hoglin"
+msgstr "Hoglin"
+
+msgid "Baby Hoglin"
+msgstr "Bébé Hoglin"
+
+msgid "Zoglin"
+msgstr "Zoglin"
+
+msgid "Sneak to dismount"
+msgstr "S'accroupir pour descendre"
+
+msgid "Horse"
+msgstr "Cheval"
+
+msgid "Skeleton Horse"
+msgstr "Cheval-squelette"
+
+msgid "Zombie Horse"
+msgstr "Cheval-zombie"
+
+msgid "Donkey"
+msgstr "Âne"
+
+msgid "Mule"
+msgstr "Mule"
+
+msgid "Iron Golem"
+msgstr "Golem de fer"
+
+msgid "Llama"
+msgstr "Lama"
+
+msgid "Ocelot"
+msgstr "Ocelot"
+
+msgid "Cat"
+msgstr "Chat"
+
+msgid "Parrot"
+msgstr "Perroquet"
+
+msgid "Pig"
+msgstr "Cochon"
+
+msgid "Piglin"
+msgstr "Piglin"
+
+msgid "Piglin Brute"
+msgstr "Piglin barbare"
+
+msgid "Zombie Piglin"
+msgstr "Piglin zombie"
+
+msgid "Zombified Piglin"
+msgstr "Piglin zombifié"
+
+msgid "Pillager"
+msgstr "Pillard"
+
+msgid "Polar Bear"
+msgstr "Ours blanc"
+
+msgid "Rabbit"
+msgstr "Lapin"
+
+msgid "Killer Bunny"
+msgstr "Lapin tueur"
+
+msgid "Salmon"
+msgstr "Saumon"
+
+msgid "Sheep"
+msgstr "Mouton"
+
+msgid "Shulker"
+msgstr "Shulker"
+
+msgid "Silverfish"
+msgstr "Poisson d'argent"
+
+msgid "Skeleton"
+msgstr "Squelette"
+
+msgid "Stray"
+msgstr "Vagabond"
+
+msgid "Wither Skeleton"
+msgstr "Wither squelette"
+
+msgid "Slime - big"
+msgstr "Slime - grand"
+
+msgid "Slime - small"
+msgstr "Slime - petit"
+
+msgid "Slime - tiny"
+msgstr "Slime - tout petit"
+
+msgid "Magma Cube - big"
+msgstr "Cube de magma - grand"
+
+msgid "Magma Cube - small"
+msgstr "Cube de magma - petit"
+
+msgid "Magma Cube - tiny"
+msgstr "Cube de magma - tout petit"
+
+msgid "Magma Cube"
+msgstr "Cube de magma"
+
+msgid "Slime"
+msgstr "Slime"
+
+msgid "Snow Golem"
+msgstr "Golem de neige"
+
+msgid "Spider"
+msgstr "Araignée"
+
+msgid "Cave Spider"
+msgstr "Araignée venimeuse"
+
+msgid "Squid"
+msgstr "Poulpe"
+
+msgid "Glow Squid"
+msgstr "Poulpe luisant"
+
+msgid "Strider"
+msgstr "Arpenteur"
+
+msgid "Baby Strider"
+msgstr "Bébé arpenteur"
+
+msgid "Tropical Fish"
+msgstr "Poisson Tropical"
+
+msgid "Vex"
+msgstr "Vex"
+
+msgid "Villager"
+msgstr "Villageois"
+
+msgid "Armorer"
+msgstr "Armurier"
+
+msgid "Butcher"
+msgstr "Boucher"
+
+msgid "Cartographer"
+msgstr "Cartographe"
+
+msgid "Cleric"
+msgstr "Prêtre"
+
+msgid "Farmer"
+msgstr "Fermier"
+
+msgid "Fisherman"
+msgstr "Pêcheur"
+
+msgid "Fletcher"
+msgstr "Fléchier"
+
+msgid "Leatherworker"
+msgstr "Tanneur"
+
+msgid "Librarian"
+msgstr "Bibliothécaire"
+
+msgid "Mason"
+msgstr "Maçon"
+
+msgid "Shepherd"
+msgstr "Berger"
+
+msgid "Toolsmith"
+msgstr "Forgeron d'outils"
+
+msgid "Weaponsmith"
+msgstr "Forgeron d'armes"
+
+msgid "Nitwit"
+msgstr "Idiot"
+
+msgid "Novice"
+msgstr "Novice"
+
+msgid "Apprentice"
+msgstr "Apprenti"
+
+msgid "Journeyman"
+msgstr "Compagnon"
+
+msgid "Expert"
+msgstr "Expert"
+
+msgid "Master"
+msgstr "Maître"
+
+msgid "Evoker"
+msgstr "Invocateur"
+
+msgid "Illusioner"
+msgstr "Illusionniste"
+
+msgid "Vindicator"
+msgstr "Vindicateur"
+
+msgid "Zombie Villager"
+msgstr "Zombie-villageois"
+
+msgid "Wandering Trader"
+msgstr "Marchand ambulant"
+
+msgid "Trader Llama"
+msgstr "Lama de marchand"
+
+msgid "Witch"
+msgstr "Sorcière"
+
+msgid "Wither"
+msgstr "Wither"
+
+msgid "Wolf"
+msgstr "Loup"
+
+msgid "Zombie"
+msgstr "Zombie"
+
+msgid "Baby Zombie"
+msgstr "Bébé zombie"
+
+msgid "Husk"
+msgstr "Zombie momifié"
+
+msgid "Baby Husk"
+msgstr "Bébé zombie momifié"
+

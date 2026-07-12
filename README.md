@@ -13,6 +13,14 @@ game once it has been built (see [Compiling](#compiling)).
 AkititoCraft is built on the open-source [Luanti](https://www.luanti.org/) engine
 (formerly Minetest) and remains free software under the LGPLv2.1+ license.
 
+**Included game:** AkititoCraft ships with a full survival sandbox game (in
+`games/mineclonia`) — mining, crafting, mobs, biomes, farming, redstone-like
+mechanics and more. After building, pick **AkititoCraft** in the main menu,
+create a world, and play. This game is based on the open-source
+[Mineclonia](https://github.com/mark-wiemer/mineclonia) game and is distributed
+under the GPLv3; see `games/mineclonia/LICENSE.txt`, `CREDITS.md`, and
+`AKITITOCRAFT_NOTICE.md` for full attribution.
+
 Copyright (C) 2010-2026 Perttu Ahola <celeron55@gmail.com>
 and contributors (see source file comments and the version control log)
 
