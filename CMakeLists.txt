@@ -245,6 +245,14 @@ if(INSTALL_DEVTEST)
 		PATTERN ".git*" EXCLUDE )
 endif()
 
+# Bundle the default AkititoCraft game so packaged builds ship a playable game.
+set(INSTALL_MINECLONIA TRUE CACHE BOOL "Install the bundled AkititoCraft game")
+
+if(INSTALL_MINECLONIA)
+	install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/games/mineclonia" DESTINATION "${SHAREDIR}/games/"
+		PATTERN ".git*" EXCLUDE )
+endif()
+
 if(BUILD_CLIENT)
 	install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/client/shaders" DESTINATION "${SHAREDIR}/client")
 	install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/textures/base/pack" DESTINATION "${SHAREDIR}/textures/base")

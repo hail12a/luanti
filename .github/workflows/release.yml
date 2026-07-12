@@ -1,0 +1,94 @@
+name: release
+
+# Builds ready-to-download AkititoCraft installer files so nobody has to
+# compile the game themselves.
+#
+# How to get an installer:
+#   * Go to the repo's "Actions" tab -> "release" -> "Run workflow" (pick a
+#     version name, e.g. v1.0), OR
+#   * Push a tag that starts with "v" (e.g. `git tag v1.0 && git push --tags`).
+#
+# When it finishes, a GitHub "Release" is created with two Windows downloads:
+#   * akititocraft-<version>.exe        -> the installer (double-click to install)
+#   * akititocraft-<version>-win64.zip  -> portable version (unzip and run)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version/tag name for this release (e.g. v1.0)"
+        required: true
+        default: "dev"
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  windows-installer:
+    name: "Windows 64-bit installer"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Work out the release tag
+        id: rel
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install cross-compiler
+        run: |
+          source ./util/ci/common.sh
+          install_mingw_deps '64' 'true'
+          sudo ./util/buildbot/download_toolchain.sh /usr
+
+      - name: Build portable package (.zip)
+        run: |
+          EXISTING_MINETEST_DIR=$PWD \
+          ./util/buildbot/buildwin64.sh B
+          mkdir -p artifact
+          cp -v B/build/*.zip artifact/
+
+      - name: Build installer (.exe)
+        run: |
+          EXISTING_MINETEST_DIR=$PWD \
+          ./util/buildbot/buildwin64.sh B -DRUN_IN_PLACE=0
+          dest=$(mktemp -d)
+          unzip -q -d "$dest" B/build/*.zip
+          cd "$dest"/akititocraft-*-nsis
+          makensis -WX -V3 sfx-launcher.nsi
+          cp -v "$dest"/*.exe "$GITHUB_WORKSPACE/artifact/"
+
+      - name: List built files
+        run: ls -lh artifact/
+
+      # Keep the files as a workflow artifact too (handy for test runs).
+      - uses: actions/upload-artifact@v7
+        with:
+          name: akititocraft-windows-64bit
+          path: artifact/*
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.rel.outputs.tag }}
+          name: AkititoCraft ${{ steps.rel.outputs.tag }}
+          body: |
+            Ready-to-play AkititoCraft build. No compiling needed.
+
+            **Windows:**
+            * `akititocraft-*.exe` — installer, just double-click it.
+            * `akititocraft-*-win64.zip` — portable, unzip and run `bin/akititocraft.exe`.
+
+            The AkititoCraft game is bundled in, so after installing just pick
+            **AkititoCraft** in the menu, create a world, and play.
+          files: artifact/*
+          draft: false
+          prerelease: false
