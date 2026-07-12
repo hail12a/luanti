@@ -163,11 +163,18 @@ local function get_formspec(tabview, name, tabdata)
 			"button[5.25,", button_y, ";5,1.2;game_open_cdb;", fgettext("Install a game"), "]"})
 	end
 
-	-- Bedrock-style flat button theming: neutral grey buttons with a bright
-	-- green primary "Play" button, applied to the whole Start Game screen.
+	-- Bedrock-style 9-sliced button textures across the screen, with a bright
+	-- green primary "Play" button.
+	local btn   = core.formspec_escape(defaulttexturedir .. "akititocraft_btn.png")
+	local btn_h = core.formspec_escape(defaulttexturedir .. "akititocraft_btn_hover.png")
+	local btn_p = core.formspec_escape(defaulttexturedir .. "akititocraft_btn_press.png")
+	local grn   = core.formspec_escape(defaulttexturedir .. "akititocraft_btn_green.png")
+	local grn_h = core.formspec_escape(defaulttexturedir .. "akititocraft_btn_green_hover.png")
 	local retval =
-		"style_type[button;border=false;bgcolor=#5a5a5aff;bgcolor_hovered=#6d6d6dff;bgcolor_pressed=#474747ff;textcolor=#ffffff]" ..
-		"style[play;border=false;bgcolor=#3fa93fff;bgcolor_hovered=#4fc44fff;bgcolor_pressed=#2f8f2fff;textcolor=#ffffff]"
+		"style_type[button;border=false;textcolor=#ffffff;bgimg=" .. btn ..
+			";bgimg_hovered=" .. btn_h .. ";bgimg_pressed=" .. btn_p .. ";bgimg_middle=8]" ..
+		"style[play;border=false;textcolor=#ffffff;bgimg=" .. grn ..
+			";bgimg_hovered=" .. grn_h .. ";bgimg_pressed=" .. grn .. ";bgimg_middle=8]"
 
 	local index = core.get_textlist_index("sp_worlds") or filterlist.get_current_index(menudata.worldlist,
 				tonumber(core.settings:get("mainmenu_last_selected_world"))) or 0
@@ -218,28 +225,25 @@ local function get_formspec(tabview, name, tabdata)
 			host ..
 			"container_end[]"
 
-	-- The world list is the hero of the screen (Bedrock "Worlds" style).
+	-- Bedrock-style dark "Worlds" panel with a Create New bar on top.
 	retval = retval ..
-			"label[5.0,0.35;".. fgettext("Select World:") .. "]" ..
-			"textlist[5.0,0.8;10.125,4.2;sp_worlds;" ..
+			"box[4.6,0.2;10.9,6.7;#0b0b0bcc]" ..
+			"button[4.9,0.5;10.3,0.8;world_create;".. fgettext("Create New") .. "]" ..
+			"textlist[4.9,1.55;10.3,3.7;sp_worlds;" ..
 			menu_render_worldlist() ..
 			";" .. index .. "]"
 
-	-- World action buttons sit directly under the list.
-	retval = retval .. "container[5.0,5.15]"
+	-- Per-world action buttons (only when a world is selected).
 	if world then
 		retval = retval ..
-				"button[0,0;3.2,0.75;world_delete;".. fgettext("Delete") .. "]" ..
-				"button[3.35,0;3.2,0.75;world_configure;".. fgettext("Select Mods") .. "]"
+				"button[4.9,5.4;5.05,0.6;world_delete;".. fgettext("Delete") .. "]" ..
+				"button[10.15,5.4;5.05,0.6;world_configure;".. fgettext("Select Mods") .. "]"
 	end
-	retval = retval ..
-			"button[6.725,0;3.4,0.75;world_create;".. fgettext("New") .. "]" ..
-			"container_end[]"
 
 	if core.settings:get_bool("enable_server") and disabled_settings["enable_server"] == nil then
-		-- Big green primary button spanning the bottom (Bedrock-style).
+		-- Big green primary button spanning the bottom of the panel.
 		retval = retval ..
-				"button[5.0,6.05;10.125,0.9;play;".. fgettext("Host Game") .. "]" ..
+				"button[4.9,6.15;10.3,0.65;play;".. fgettext("Host Game") .. "]" ..
 				"container[0.375,0.375]" ..
 				"checkbox[0,"..y..";cb_server_announce;" .. fgettext("Announce Server") .. ";" ..
 				dump(core.settings:get_bool("server_announce")) .. "]"
@@ -273,9 +277,9 @@ local function get_formspec(tabview, name, tabdata)
 
 		retval = retval .. "container_end[]"
 	elseif world then
-		-- Big green primary button spanning the bottom (Bedrock-style).
+		-- Big green primary button spanning the bottom of the panel.
 		retval = retval ..
-				"button[5.0,6.05;10.125,0.9;play;" .. fgettext("Play Game") .. "]"
+				"button[4.9,6.15;10.3,0.65;play;" .. fgettext("Play Game") .. "]"
 	end
 
 	return retval
