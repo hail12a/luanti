@@ -37,6 +37,7 @@ jobs:
         run: |
           if git ls-files |\
             grep -E '\.txt$|\.md$|\.[ch]$|\.cpp$|\.hpp$|\.sh$|\.cmake$|\.glsl$' |\
+            grep -v '^games/mineclonia/' |\
             xargs grep -n '\s$';\
           then\
             echo -e "\033[0;31mFound trailing whitespace";\
@@ -62,6 +63,7 @@ jobs:
               python3 ./util/ci/indent_tab_preprocess.py "/*" "*/"
           git ls-files |\
             grep -E '\.lua$' |\
+            grep -v '^games/mineclonia/' |\
             xargs -L 1 -P $(($(nproc) + 1)) \
               python3 ./util/ci/indent_tab_preprocess.py "--[[" "]]"
       # Check for bad indent.
@@ -72,6 +74,7 @@ jobs:
         run: |
           if git ls-files |\
             grep -E '^src/.*\.cpp$|^src/.*\.[ch]$|\.lua$' |\
+            grep -v '^games/mineclonia/' |\
             xargs grep -n -P '^\t*[ ]';\
           then\
             echo -e "\033[0;31mFound incorrect indent whitespaces";\

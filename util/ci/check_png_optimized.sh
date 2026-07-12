@@ -3,7 +3,8 @@
 # Only warn if decrease is more than 3%
 optimization_requirement=3
 
-git ls-files "*.png" | sort -u | (
+# Skip games/mineclonia: it is vendored third-party art with its own tooling.
+git ls-files "*.png" | grep -v '^games/mineclonia/' | sort -u | (
 	optimized=1
 	temp_file=$(mktemp)
 	echo "Optimizing png files:"

@@ -92,19 +92,19 @@ jobs:
         run: |
           mkdir -p "${HOME}/Library/Application Support/minetest/games/"
           ln -s "${PWD}/games/devtest" "${HOME}/Library/Application Support/minetest/games/"
-          ./build/macos/luanti.app/Contents/MacOS/luanti --run-unittests
+          ./build/macos/akititocraft.app/Contents/MacOS/akititocraft --run-unittests
 
       - name: Test XCode build
         if: ${{matrix.xcode == 'yes'}}
         run: |
-          ./build_xcode/build/${build_type}/luanti.app/Contents/MacOS/luanti --run-unittests
-          ./build_xcode/luanti.xcarchive/Products/Applications/luanti.app/Contents/MacOS/luanti --run-unittests
+          ./build_xcode/build/${build_type}/akititocraft.app/Contents/MacOS/akititocraft --run-unittests
+          ./build_xcode/akititocraft.xcarchive/Products/Applications/akititocraft.app/Contents/MacOS/akititocraft --run-unittests
 
       - name: Diff Resources
         if: ${{matrix.xcode == 'yes'}}
         run: |
-          diff -rd ./build/macos/luanti.app/Contents/Resources ./build_xcode/build/${build_type}/luanti.app/Contents/Resources || exit 1
-          diff -rd ./build/macos/luanti.app/Contents/Resources ./build_xcode/luanti.xcarchive/Products/Applications/luanti.app/Contents/Resources || exit 1
+          diff -rd ./build/macos/akititocraft.app/Contents/Resources ./build_xcode/build/${build_type}/akititocraft.app/Contents/Resources || exit 1
+          diff -rd ./build/macos/akititocraft.app/Contents/Resources ./build_xcode/akititocraft.xcarchive/Products/Applications/akititocraft.app/Contents/Resources || exit 1
       # Zipping the built .app preserves permissions on the contained files,
       #   which the GitHub artifact pipeline would otherwise strip away.
       - name: CPack

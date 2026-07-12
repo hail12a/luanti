@@ -73,9 +73,9 @@ RUN apk add --no-cache curl gmp libstdc++ libgcc libpq jsoncpp zstd-libs \
 
 WORKDIR /var/lib/minetest
 
-COPY --from=builder /usr/local/share/luanti /usr/local/share/luanti
-COPY --from=builder /usr/local/bin/luantiserver /usr/local/bin/luantiserver
-COPY --from=builder /usr/local/share/doc/luanti/minetest.conf.example /etc/minetest/minetest.conf
+COPY --from=builder /usr/local/share/akititocraft /usr/local/share/akititocraft
+COPY --from=builder /usr/local/bin/akititocraftserver /usr/local/bin/akititocraftserver
+COPY --from=builder /usr/local/share/doc/akititocraft/minetest.conf.example /etc/minetest/minetest.conf
 COPY --from=builder /usr/local/lib/libspatialindex* /usr/local/lib/
 COPY --from=builder /usr/local/lib/libluajit* /usr/local/lib/
 USER minetest:minetest
@@ -83,5 +83,5 @@ USER minetest:minetest
 EXPOSE 30000/udp 30000/tcp
 VOLUME /var/lib/minetest/ /etc/minetest/
 
-ENTRYPOINT ["/usr/local/bin/luantiserver"]
+ENTRYPOINT ["/usr/local/bin/akititocraftserver"]
 CMD ["--config", "/etc/minetest/minetest.conf"]
