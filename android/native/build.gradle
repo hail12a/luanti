@@ -10,6 +10,10 @@ android {
 		externalNativeBuild {
 			cmake {
 				arguments "-DANDROID_STL=c++_shared",
+					// Use the modern NDK toolchain file so linking uses lld;
+					// the legacy toolchain defaults to the gold linker, which
+					// newer NDKs (r28+) no longer ship.
+					"-DANDROID_USE_LEGACY_TOOLCHAIN_FILE=OFF",
 					"-DENABLE_CURL=1", "-DENABLE_SOUND=1",
 					"-DENABLE_GETTEXT=1",
 					"-DBUILD_UNITTESTS=0", "-DENABLE_UPDATE_CHECKER=0"
