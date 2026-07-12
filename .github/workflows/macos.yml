@@ -15,6 +15,7 @@ on:
       - 'cmake/Modules/**'
       - 'po/**.po'
       - 'util/ci/**'
+      - 'misc/**'
       - '.github/workflows/macos.yml'
   pull_request:
     paths:
@@ -29,6 +30,7 @@ on:
       - 'cmake/Modules/**'
       - 'po/**.po'
       - 'util/ci/**'
+      - 'misc/**'
       - '.github/workflows/macos.yml'
 
 jobs:
