@@ -78,7 +78,9 @@ void set_default_settings()
 	settings->setDefault("language", "");
 	settings->setDefault("name", "");
 	settings->setDefault("bind_address", "");
-	settings->setDefault("serverlist_url", "https://servers.luanti.org");
+	// AkititoCraft uses its own server list (add servers by IP); the public
+	// Luanti server list is disabled by default (empty URL).
+	settings->setDefault("serverlist_url", "");
 
 	// Client
 	settings->setDefault("address", "");

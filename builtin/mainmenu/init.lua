@@ -111,7 +111,9 @@ local function init_globals()
 
 	tv_main:set_autosave_tab(true)
 	tv_main:add(tabs.local_game)
-	-- "Join Game" (play_online) removed: AkititoCraft uses hosting instead.
+	-- "Servers" tab: AkititoCraft's own server list (add a server by IP and
+	-- join). The public Luanti server list is disabled in serverlistmgr.
+	tv_main:add(tabs.play_online)
 	-- "Content" (mod/texture-pack browser) removed for a Bedrock-style menu.
 	tv_main:add(tabs.about)
 

@@ -59,64 +59,14 @@ function apply_game(game)
 end
 
 function singleplayer_refresh_gamebar()
-
+	-- AkititoCraft ships a single game, so the game-selection bar is removed
+	-- entirely. The active game is applied via current_game()/apply_game()
+	-- in on_change, so no bar is needed; always report that none is shown.
 	local old_bar = ui.find_by_name("game_button_bar")
 	if old_bar ~= nil then
 		old_bar:delete()
 	end
-
-	-- Hide gamebar if no games are installed
-	if #pkgmgr.games == 0 then
-		return false
-	end
-
-	local function game_buttonbar_button_handler(fields)
-		for _, game in ipairs(pkgmgr.games) do
-			if fields["game_btnbar_" .. game.id] then
-				apply_game(game)
-				return true
-			end
-		end
-	end
-
-	local TOUCH_GUI = core.settings:get_bool("touch_gui")
-
-	local gamebar_pos_y = MAIN_TAB_H
-		+ TABHEADER_H -- tabheader included in formspec size
-		+ (TOUCH_GUI and GAMEBAR_OFFSET_TOUCH or GAMEBAR_OFFSET_DESKTOP)
-
-	local btnbar = buttonbar_create(
-			"game_button_bar",
-			{x = 0, y = gamebar_pos_y},
-			{x = MAIN_TAB_W, y = GAMEBAR_H},
-			"#000000",
-			game_buttonbar_button_handler)
-
-	for _, game in ipairs(pkgmgr.games) do
-		local btn_name = "game_btnbar_" .. game.id
-
-		local image = nil
-		local text = nil
-		local tooltip = core.formspec_escape(game.title)
-
-		if (game.menuicon_path or "") ~= "" then
-			image = core.formspec_escape(game.menuicon_path)
-		else
-			local part1 = game.id:sub(1,5)
-			local part2 = game.id:sub(6,10)
-			local part3 = game.id:sub(11)
-
-			text = part1 .. "\n" .. part2
-			if part3 ~= "" then
-				text = text .. "\n" .. part3
-			end
-		end
-		btnbar:add_button(btn_name, text, image, tooltip)
-	end
-
-	-- The "+" (Install games/mods from ContentDB) button is intentionally
-	-- omitted: AkititoCraft ships its own game and does not browse ContentDB.
-	return true
+	return false
 end
 
 local function get_disabled_settings(game)

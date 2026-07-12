@@ -149,10 +149,8 @@ function serverlistmgr.sync()
 
 	local serverlist_url = core.settings:get("serverlist_url") or ""
 	if not core.get_http_api or serverlist_url == "" then
-		serverlistmgr.servers = {{
-			name = fgettext("Public server list is disabled"),
-			description = ""
-		}}
+		-- Public list disabled: show only the player's own servers (favorites).
+		serverlistmgr.servers = {}
 		return
 	end
 
