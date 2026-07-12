@@ -114,8 +114,8 @@ function singleplayer_refresh_gamebar()
 		btnbar:add_button(btn_name, text, image, tooltip)
 	end
 
-	local plus_image = core.formspec_escape(defaulttexturedir .. "plus.png")
-	btnbar:add_button("game_open_cdb", "", plus_image, fgettext("Install games from ContentDB"))
+	-- The "+" (Install games/mods from ContentDB) button is intentionally
+	-- omitted: AkititoCraft ships its own game and does not browse ContentDB.
 	return true
 end
 
