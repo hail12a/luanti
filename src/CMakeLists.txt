@@ -1,4 +1,4 @@
-project(luanti)
+project(akititocraft)
 
 INCLUDE(CheckTypeSize)
 INCLUDE(CheckIncludeFiles)
