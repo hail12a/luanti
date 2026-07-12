@@ -383,7 +383,7 @@ void GameFormSpec::showPauseMenu()
 	os << "formspec_version[1]" << SIZE_TAG
 		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_continue;"
 		// TRANSLATORS: Pause menu button, try to keep the translation short
-		<< strgettext("Continue") << "]";
+		<< strgettext("Resume Game") << "]";
 
 	if (!simple_singleplayer_mode) {
 		os << "button[4," << (ypos++) << ";3,0.5;btn_change_password;"
@@ -407,10 +407,10 @@ void GameFormSpec::showPauseMenu()
 
 	os		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_exit_menu;"
 		// TRANSLATORS: Pause menu button, try to keep the translation short
-		<< strgettext("Exit to Menu") << "]";
+		<< strgettext("Quit to Title") << "]";
 	os		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_exit_os;"
 		// TRANSLATORS: Pause menu button, try to keep the translation short (OS = Operating System)
-		<< strgettext("Exit to OS")   << "]";
+		<< strgettext("Quit Game")   << "]";
 	if (!control_text.empty()) {
 	os		<< "textarea[7.5,0.25;3.9,6.25;;" << control_text << ";]";
 	}
