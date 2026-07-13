@@ -350,10 +350,17 @@ local function main_button_handler(this, fields, name, tabdata)
 			gamedata.mode       = "host"
 			gamedata.playername = fields["te_playername"]
 			gamedata.password   = fields["te_passwd"]
-			gamedata.port       = fields["te_serverport"]
+			-- If the port field is empty or non-numeric, fall back to the
+			-- default 30000. Passing "" here caused the server to bind to
+			-- port 0 (a random ephemeral port) which nobody could connect to.
+			local port_field = fields["te_serverport"]
+			if port_field == nil or tonumber(port_field) == nil then
+				port_field = "30000"
+			end
+			gamedata.port       = port_field
 			gamedata.address    = ""
 
-			core.settings:set("port",gamedata.port)
+			core.settings:set("port", gamedata.port)
 			if fields["te_serveraddr"] ~= nil then
 				core.settings:set("bind_address",fields["te_serveraddr"])
 			end
