@@ -49,6 +49,32 @@ jobs:
     - name: Build APKs with Gradle
       # "assemblerelease" is very fast after "bundlerelease".
       run: cd android; ./gradlew assemblerelease
+    - name: Sign APKs
+      # The release APKs come out of Gradle unsigned, and Android refuses to
+      # install an unsigned package ("package appears to be invalid"). We sign
+      # every ABI with a self-signed key generated here so the artifacts can be
+      # sideloaded directly. This is not a Play Store upload key (the AAB is
+      # signed by Google Play); it just makes the standalone APKs installable.
+      run: |
+        set -eu
+        KS="$RUNNER_TEMP/akititocraft.keystore"
+        keytool -genkeypair -v -keystore "$KS" \
+          -alias akititocraft -keyalg RSA -keysize 2048 -validity 10000 \
+          -storepass akititocraft -keypass akititocraft \
+          -dname "CN=AkititoCraft, OU=Game, O=AkititoCraft, L=NA, ST=NA, C=NA"
+        BT="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n1)"
+        echo "Using build-tools: $BT"
+        OUT=android/app/build/outputs/apk/release
+        for abi in armeabi-v7a arm64-v8a x86 x86_64; do
+          in="$OUT/app-$abi-release-unsigned.apk"
+          aligned="$OUT/app-$abi-aligned.apk"
+          out="$OUT/AkititoCraft-$abi.apk"
+          "$BT/zipalign" -f -p 4 "$in" "$aligned"
+          "$BT/apksigner" sign \
+            --ks "$KS" --ks-pass pass:akititocraft --key-pass pass:akititocraft \
+            --out "$out" "$aligned"
+          "$BT/apksigner" verify --verbose "$out"
+        done
     - name: Save AAB artifact
       uses: actions/upload-artifact@v7
       with:
@@ -57,20 +83,20 @@ jobs:
     - name: Save armeabi artifact
       uses: actions/upload-artifact@v7
       with:
-        name: Luanti-armeabi-v7a.apk
-        path: android/app/build/outputs/apk/release/app-armeabi-v7a-release-unsigned.apk
+        name: AkititoCraft-armeabi-v7a.apk
+        path: android/app/build/outputs/apk/release/AkititoCraft-armeabi-v7a.apk
     - name: Save arm64 artifact
       uses: actions/upload-artifact@v7
       with:
-        name: Luanti-arm64-v8a.apk
-        path: android/app/build/outputs/apk/release/app-arm64-v8a-release-unsigned.apk
+        name: AkititoCraft-arm64-v8a.apk
+        path: android/app/build/outputs/apk/release/AkititoCraft-arm64-v8a.apk
     - name: Save x86 artifact
       uses: actions/upload-artifact@v7
       with:
-        name: Luanti-x86.apk
-        path: android/app/build/outputs/apk/release/app-x86-release-unsigned.apk
+        name: AkititoCraft-x86.apk
+        path: android/app/build/outputs/apk/release/AkititoCraft-x86.apk
     - name: Save x86_64 artifact
       uses: actions/upload-artifact@v7
       with:
-        name: Luanti-x86_64.apk
-        path: android/app/build/outputs/apk/release/app-x86_64-release-unsigned.apk
+        name: AkititoCraft-x86_64.apk
+        path: android/app/build/outputs/apk/release/AkititoCraft-x86_64.apk
