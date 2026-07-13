@@ -87,6 +87,13 @@ task prepareAssets() {
 		copy {
 			from "${projRoot}/textures/base/pack" into "${assetsFolder}/textures/base/pack"
 		}
+		// Bundle the built-in AkititoCraft game (Mineclonia) so the APK ships
+		// with something playable out of the box. Without this the main menu
+		// shows an empty game list and tells the user to install mods.
+		copy {
+			from "${projRoot}/games/mineclonia" into "${assetsFolder}/games/mineclonia"
+			exclude '**/.git', '**/.git/**', '**/.gitignore', '**/.gitattributes'
+		}
 
 		// compile translations
 		fileTree("${projRoot}/po").include("**/*.po").grep {
