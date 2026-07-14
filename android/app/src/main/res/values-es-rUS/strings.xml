@@ -5,8 +5,8 @@
     <string name="no_web_browser">No se encontró ningún navegador web</string>
     <string name="loading">Cargando…</string>
     <string name="notification_channel_name">Notificación General</string>
-    <string name="label">Luanti</string>
-    <string name="notification_channel_description">Notificaciones de Luanti</string>
-    <string name="unzip_notification_title">Cargando Luanti</string>
-    <string name="game_notification_title">Luanti se está ejecutando</string>
+    <string name="label">AkititoCraft</string>
+    <string name="notification_channel_description">Notificaciones de AkititoCraft</string>
+    <string name="unzip_notification_title">Cargando AkititoCraft</string>
+    <string name="game_notification_title">AkititoCraft se está ejecutando</string>
 </resources>

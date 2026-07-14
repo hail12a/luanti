@@ -103,8 +103,8 @@ local function get_formspec(tabview, name, tabdata)
 		local H = tabview.height
 
 		local hypertext = "<global valign=middle halign=center size=18>" ..
-				fgettext_ne("Luanti is a game-creation platform that allows you to play many different games.") .. "\n" ..
-				fgettext_ne("Luanti doesn't come with a game by default.") .. " " ..
+				fgettext_ne("AkititoCraft is a Minecraft-style voxel game.") .. "\n" ..
+				fgettext_ne("The built-in game wasn't installed with this build.") .. " " ..
 				fgettext_ne("You need to install a game before you can create a world.")
 
 		local button_y = H * 2/3 - 0.6
@@ -175,11 +175,16 @@ local function get_formspec(tabview, name, tabdata)
 			host ..
 			"container_end[]"
 
-	-- Bedrock-style dark "Worlds" panel with a Create New bar on top.
+	-- Bedrock-style dark "Worlds" panel with an AkititoCraft header strip.
+	-- Uses hypertext for the title so we can size/weight it without leaking
+	-- style_type state onto surrounding labels.
 	retval = retval ..
 			"box[4.6,0.2;10.9,6.7;#0b0b0bcc]" ..
-			"button[4.9,0.5;10.3,0.8;world_create;".. fgettext("Create New") .. "]" ..
-			"textlist[4.9,1.55;10.3,3.7;sp_worlds;" ..
+			"box[4.6,0.2;10.9,0.65;#1e88e5cc]" ..
+			"hypertext[4.85,0.25;10,0.55;title;" ..
+				"<global valign=middle size=22><b><style color=#ffffff>AkititoCraft</style></b>]" ..
+			"button[4.9,0.95;10.3,0.7;world_create;".. fgettext("Create New") .. "]" ..
+			"textlist[4.9,1.8;10.3,3.5;sp_worlds;" ..
 			menu_render_worldlist() ..
 			";" .. index .. "]"
 
