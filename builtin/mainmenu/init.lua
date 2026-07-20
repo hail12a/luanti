@@ -39,28 +39,32 @@ dofile(menupath .. DIR_DELIM .. "dlg_reinstall_mtg.lua")
 dofile(menupath .. DIR_DELIM .. "dlg_rebind_keys.lua")
 dofile(menupath .. DIR_DELIM .. "dlg_clients_list.lua")
 dofile(menupath .. DIR_DELIM .. "dlg_server_list_mods.lua")
+dofile(menupath .. DIR_DELIM .. "dlg_home.lua")
 
 local tabs = {
 	content  = dofile(menupath .. DIR_DELIM .. "tab_content.lua"),
 	about = dofile(menupath .. DIR_DELIM .. "tab_about.lua"),
 	local_game = dofile(menupath .. DIR_DELIM .. "tab_local.lua"),
+	friends = dofile(menupath .. DIR_DELIM .. "tab_friends.lua"),
 	play_online = dofile(menupath .. DIR_DELIM .. "tab_online.lua")
 }
 
+-- On the Play screen, Esc / the top-right button returns to the home screen
+-- rather than quitting the game.
+local function go_home()
+	local home = ui.find_by_name("home")
+	local play = ui.find_by_name("maintab")
+	if play then play:hide() end
+	if home then home:show() end
+	ui.update()
+	return true
+end
+
 local function main_event_handler(tabview, event)
 	if event == "MenuQuit" then
-		local show_dialog = core.settings:get_bool("enable_esc_dialog")
-		if not ui.childlist["mainmenu_quit_confirm"] and show_dialog then
-			tabview:hide()
-			local dlg = create_exit_dialog()
-			dlg:set_parent(tabview)
-			dlg:show()
-		else
-			core.close()
-		end
-		return true
+		return go_home()
 	end
-	return true
+	return false
 end
 
 local function init_globals()
@@ -106,48 +110,66 @@ local function init_globals()
 	mm_game_theme.init()
 	mm_game_theme.set_engine() -- This is just a fallback.
 
-	-- Create main tabview
-	local tv_main = tabview_create("maintab", {x = MAIN_TAB_W, y = MAIN_TAB_H}, {x = 0, y = 0})
+	-- The "Play" screen: a tabview holding Worlds / Friends / Servers.
+	-- It starts hidden; the home screen shows it when Play is pressed.
+	local tv_play = tabview_create("maintab", {x = MAIN_TAB_W, y = MAIN_TAB_H}, {x = 0, y = 0})
 
-	tv_main:set_autosave_tab(true)
-	tv_main:add(tabs.local_game)
-	-- "Servers" tab: AkititoCraft's own server list (add a server by IP and
-	-- join). The public Luanti server list is disabled in serverlistmgr.
-	tv_main:add(tabs.play_online)
-	-- "Content" (mod/texture-pack browser) removed for a Bedrock-style menu.
-	tv_main:add(tabs.about)
+	tv_play:set_autosave_tab(true)
+	tv_play:add(tabs.local_game)    -- Worlds
+	tv_play:add(tabs.friends)       -- Friends (placeholder for now)
+	-- "Servers": AkititoCraft's own server list (join by IP). The public
+	-- Luanti server list is disabled in serverlistmgr.
+	tv_play:add(tabs.play_online)
 
-	tv_main:set_global_event_handler(main_event_handler)
-	tv_main:set_fixed_size(false)
+	tv_play:set_global_event_handler(main_event_handler)
+	tv_play:set_fixed_size(false)
 
 	local last_tab = core.settings:get("maintab_LAST")
-	if last_tab and tv_main.current_tab ~= last_tab then
-		tv_main:set_tab(last_tab)
+	if last_tab and tv_play.current_tab ~= last_tab then
+		tv_play:set_tab(last_tab)
 	end
 
-	tv_main:set_end_button({
-		icon = defaulttexturedir .. "settings_btn.png",
-		label = fgettext("Settings"),
-		name = "open_settings",
-		on_click = function(tabview)
-			local dlg = create_settings_dlg()
-			dlg:set_parent(tabview)
-			tabview:hide()
-			dlg:show()
-			return true
+	-- Top-right button on the Play screen returns to the home menu.
+	tv_play:set_end_button({
+		icon = defaulttexturedir .. "exit_btn.png",
+		label = fgettext("Back to menu"),
+		name = "back_home",
+		on_click = function()
+			return go_home()
 		end,
 	})
 
-	ui.set_default("maintab")
-	tv_main:show()
+	-- The home / landing screen. This is the default UI shown at startup.
+	local home = create_home_dlg({
+		on_play = function(this)
+			this:hide()
+			tv_play:show()
+			ui.update()
+		end,
+		on_settings = function(this)
+			local dlg = create_settings_dlg()
+			dlg:set_parent(this)
+			this:hide()
+			dlg:show()
+		end,
+		on_about = function(this)
+			local dlg = create_about_dlg()
+			dlg:set_parent(this)
+			this:hide()
+			dlg:show()
+		end,
+	})
+
+	ui.set_default("home")
+	home:show()
 	ui.update()
 
 	-- synchronous, chain parents to only show one at a time
-	local parent = tv_main
+	local parent = home
 	parent = migrate_keybindings(parent)
 	check_reinstall_mtg(parent)
 
-	-- asynchronous, will only be shown if we're still on "maintab"
+	-- asynchronous, only shown if the Play screen happens to be open
 	check_new_version()
 end
 
