@@ -79,13 +79,20 @@ local function create_world_formspec(dialogdata)
 end
 
 local function create_world_buttonhandler(this, fields)
-	-- Keep the game mode in sync while the dialog is open.
-	if fields.dd_gamemode then
-		core.settings:set_bool("creative_mode", fields.dd_gamemode == fgettext("Creative"))
+	-- Note: a dropdown resubmits its value on *every* button press, so we must
+	-- handle the real buttons FIRST and only read dd_gamemode, never early-
+	-- return on it (that was swallowing the Create/Cancel clicks).
+
+	if fields.world_create_cancel then
+		this:delete()
 		return true
 	end
 
 	if fields.world_create_confirm or fields.key_enter then
+		-- Apply the selected game mode.
+		if fields.dd_gamemode then
+			core.settings:set_bool("creative_mode", fields.dd_gamemode == fgettext("Creative"))
+		end
 		if fields.key_enter then
 			-- HACK: prevents double-triggering when pressing Enter on a field
 			-- and releasing on a button due to instant formspec updates.
@@ -152,11 +159,6 @@ local function create_world_buttonhandler(this, fields)
 	-- Remember typed values across refreshes.
 	this.data.worldname = fields.te_world_name
 	this.data.seed = fields.te_seed or ""
-
-	if fields.world_create_cancel then
-		this:delete()
-		return true
-	end
 
 	return false
 end

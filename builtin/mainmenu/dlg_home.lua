@@ -43,9 +43,10 @@ local function home_formspec()
 		"bgcolor[;neither]",
 		("container[0,%f]"):format(TABHEADER_H),
 
-		-- Backdrop + soft card behind the buttons.
-		("box[0,0;%f,%f;#0000008C]"):format(CONTENT_W, CONTENT_H),
-		("box[%f,2.6;%f,5.7;#101f33cc]"):format(bx - 0.85, bw + 1.7),
+		-- Light dim so the background scene shows, plus a solid card behind
+		-- the buttons for contrast.
+		("box[0,0;%f,%f;#00000047]"):format(CONTENT_W, CONTENT_H),
+		("box[%f,2.6;%f,5.7;#101f33ee]"):format(bx - 0.85, bw + 1.7),
 		("box[%f,2.6;%f,0.07;#1e88e5]"):format(bx - 0.85, bw + 1.7),
 
 		-- Title + subtitle (styled text; no logo art needed).
