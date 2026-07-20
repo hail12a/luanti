@@ -113,28 +113,19 @@ local function get_formspec(tabview, name, tabdata)
 			"button[5.25,", button_y, ";5,1.2;game_open_cdb;", fgettext("Install a game"), "]"})
 	end
 
-	-- Bedrock-style 9-sliced button textures across the screen, with a bright
-	-- green primary "Play" button.
-	local btn   = core.formspec_escape(defaulttexturedir .. "akititocraft_btn.png")
-	local btn_h = core.formspec_escape(defaulttexturedir .. "akititocraft_btn_hover.png")
-	local btn_p = core.formspec_escape(defaulttexturedir .. "akititocraft_btn_press.png")
+	-- Green primary-button skin (the grey skin is emitted by the frame).
 	local grn   = core.formspec_escape(defaulttexturedir .. "akititocraft_btn_green.png")
 	local grn_h = core.formspec_escape(defaulttexturedir .. "akititocraft_btn_green_hover.png")
-	local retval =
-		"style_type[button;border=false;textcolor=#ffffff;bgimg=" .. btn ..
-			";bgimg_hovered=" .. btn_h .. ";bgimg_pressed=" .. btn_p .. ";bgimg_middle=8]" ..
-		"style[play;border=false;textcolor=#ffffff;bgimg=" .. grn ..
-			";bgimg_hovered=" .. grn_h .. ";bgimg_pressed=" .. grn .. ";bgimg_middle=8]"
 
 	local index = core.get_textlist_index("sp_worlds") or filterlist.get_current_index(menudata.worldlist,
 				tonumber(core.settings:get("mainmenu_last_selected_world"))) or 0
 
 	local list = menudata.worldlist:get_list()
-	-- When changing tabs to a world list with fewer entries, the last index is selected (visually).
-	-- However, the formspec fields lag behind, thus 'index > #list' can be a valid choice.
+	-- When changing tabs to a world list with fewer entries, the last index is
+	-- selected (visually). The formspec fields lag behind, thus 'index > #list'
+	-- can be a valid choice.
 	local world = list and list[math.min(index, #list)]
 	local game
-
 	if world then
 		game = pkgmgr.find_by_gameid(world.gameid)
 	else
@@ -142,100 +133,90 @@ local function get_formspec(tabview, name, tabdata)
 	end
 	local disabled_settings = get_disabled_settings(game)
 
-	local creative, damage, host = "", "", ""
+	local host_mode = core.settings:get_bool("enable_server")
+			and disabled_settings["enable_server"] == nil
 
-	-- Y offsets for game settings checkboxes
-	local y = 0.2
-	local yo = 0.5625
+	-- Content-region geometry (shared with the frame via the AC table).
+	local px, pw = AC.PX, AC.PW
+	local ix = px + 0.35
+	local iw = pw - 0.7
 
+	local retval =
+		"style[play;border=false;font=bold;textcolor=#ffffff;bgimg=" .. grn ..
+			";bgimg_hovered=" .. grn_h .. ";bgimg_pressed=" .. grn .. ";bgimg_middle=8]" ..
+		-- Panel with a green "Worlds" header strip.
+		string.format("box[%f,0.2;%f,8.4;#0e1a2ecc]", px, pw) ..
+		string.format("box[%f,0.2;%f,0.85;%s]", px, pw, AC.ACCENT.worlds) ..
+		string.format("hypertext[%f,0.3;10,0.6;h_worlds;" ..
+			"<global valign=middle size=24 color=#ffffff><b>Worlds</b>]", ix) ..
+		string.format("button[%f,1.25;%f,0.85;world_create;%s]", ix, iw, fgettext("Create New"))
+
+	-- The world list shrinks in host mode to make room for the server fields.
+	local list_h = host_mode and 2.45 or 3.65
+	retval = retval ..
+		string.format("textlist[%f,2.25;%f,%f;sp_worlds;", ix, iw, list_h) ..
+		menu_render_worldlist() .. ";" .. index .. "]"
+
+	local y = 2.25 + list_h + 0.15
+
+	-- Per-world actions (Delete / Select Mods).
 	if world then
+		local half = (iw - 0.3) / 2
+		retval = retval ..
+			string.format("button[%f,%f;%f,0.6;world_delete;%s]", ix, y, half, fgettext("Delete")) ..
+			string.format("button[%f,%f;%f,0.6;world_configure;%s]",
+				ix + half + 0.3, y, half, fgettext("Select Mods"))
+	end
+	y = y + 0.75
+
+	-- Game option checkboxes laid out in a row.
+	if world then
+		local cx = ix
 		if disabled_settings["creative_mode"] == nil then
-			creative = "checkbox[0,"..y..";cb_creative_mode;".. fgettext("Creative Mode") .. ";" ..
-				dump(core.settings:get_bool("creative_mode")) .. "]"
-			y = y + yo
+			retval = retval .. string.format("checkbox[%f,%f;cb_creative_mode;%s;%s]",
+				cx, y + 0.1, fgettext("Creative"), dump(core.settings:get_bool("creative_mode")))
+			cx = cx + 3.2
 		end
 		if disabled_settings["enable_damage"] == nil then
-			damage = "checkbox[0,"..y..";cb_enable_damage;".. fgettext("Enable Damage") .. ";" ..
-				dump(core.settings:get_bool("enable_damage")) .. "]"
-			y = y + yo
+			retval = retval .. string.format("checkbox[%f,%f;cb_enable_damage;%s;%s]",
+				cx, y + 0.1, fgettext("Damage"), dump(core.settings:get_bool("enable_damage")))
+			cx = cx + 3.2
 		end
 		if disabled_settings["enable_server"] == nil then
-			host = "checkbox[0,"..y..";cb_server;".. fgettext("Host Server") ..";" ..
-				dump(core.settings:get_bool("enable_server")) .. "]"
-			y = y + yo
+			retval = retval .. string.format("checkbox[%f,%f;cb_server;%s;%s]",
+				cx, y + 0.1, fgettext("Host Server"), dump(core.settings:get_bool("enable_server")))
+			cx = cx + 3.9
+		end
+		if host_mode then
+			retval = retval .. string.format("checkbox[%f,%f;cb_server_announce;%s;%s]",
+				cx, y + 0.1, fgettext("Announce"), dump(core.settings:get_bool("server_announce")))
 		end
 	end
+	y = y + 0.7
 
-	-- Left column: world options (Creative / Damage / Host Server).
-	-- In host mode the server fields are added below (second container).
-	retval = retval ..
-			"container[0.375,0.375]" ..
-			creative ..
-			damage ..
-			host ..
-			"container_end[]"
-
-	-- Bedrock-style dark "Worlds" panel with an AkititoCraft header strip.
-	-- Uses hypertext for the title so we can size/weight it without leaking
-	-- style_type state onto surrounding labels.
-	retval = retval ..
-			"box[4.6,0.2;10.9,6.7;#0b0b0bcc]" ..
-			"box[4.6,0.2;10.9,0.65;#1e88e5cc]" ..
-			"hypertext[4.85,0.25;10,0.55;title;" ..
-				"<global valign=middle size=22><b><style color=#ffffff>AkititoCraft</style></b>]" ..
-			"button[4.9,0.95;10.3,0.7;world_create;".. fgettext("Create New") .. "]" ..
-			"textlist[4.9,1.8;10.3,3.5;sp_worlds;" ..
-			menu_render_worldlist() ..
-			";" .. index .. "]"
-
-	-- Per-world action buttons (only when a world is selected).
-	if world then
-		retval = retval ..
-				"button[4.9,5.4;5.05,0.6;world_delete;".. fgettext("Delete") .. "]" ..
-				"button[10.15,5.4;5.05,0.6;world_configure;".. fgettext("Select Mods") .. "]"
-	end
-
-	if core.settings:get_bool("enable_server") and disabled_settings["enable_server"] == nil then
-		-- Big green primary button spanning the bottom of the panel.
-		retval = retval ..
-				"button[4.9,6.15;10.3,0.65;play;".. fgettext("Host Game") .. "]" ..
-				"container[0.375,0.375]" ..
-				"checkbox[0,"..y..";cb_server_announce;" .. fgettext("Announce Server") .. ";" ..
-				dump(core.settings:get_bool("server_announce")) .. "]"
-
-		-- Reset y so that the text fields always start at the same position,
-		-- regardless of whether some of the checkboxes are hidden.
-		y = 0.2 + 4 * yo + 0.35
-
-		retval = retval .. "field[0," .. y .. ";4.5,0.75;te_playername;" .. fgettext("Name") .. ";" ..
-				core.formspec_escape(current_name) .. "]"
-
-		y = y + 1.15 + 0.25
-
-		retval = retval .. "pwdfield[0," .. y .. ";4.5,0.75;te_passwd;" .. fgettext("Password") .. "]"
-
-		y = y + 1.15 + 0.25
-
+	-- Server fields, only while hosting.
+	if host_mode then
+		retval = retval .. string.format("field[%f,%f;4.0,0.7;te_playername;%s;%s]",
+			ix, y, fgettext("Name"), core.formspec_escape(current_name))
+		retval = retval .. string.format("pwdfield[%f,%f;4.0,0.7;te_passwd;%s]",
+			ix + 4.3, y, fgettext("Password"))
 		local bind_addr = core.settings:get("bind_address")
 		if bind_addr ~= nil and bind_addr ~= "" then
 			retval = retval ..
-				"field[0," .. y .. ";3,0.75;te_serveraddr;" .. fgettext("Bind Address") .. ";" ..
-				core.formspec_escape(core.settings:get("bind_address")) .. "]" ..
-				-- TRANSLATORS: Network port
-				"field[3.25," .. y .. ";1.25,0.75;te_serverport;" .. fgettext("Port") .. ";" ..
-				core.formspec_escape(current_port) .. "]"
+				string.format("field[%f,%f;2.6,0.7;te_serveraddr;%s;%s]",
+					ix + 8.6, y, fgettext("Bind"), core.formspec_escape(bind_addr)) ..
+				string.format("field[%f,%f;1.9,0.7;te_serverport;%s;%s]",
+					ix + 11.4, y, fgettext("Port"), core.formspec_escape(current_port))
 		else
-			retval = retval ..
-				"field[0," .. y .. ";4.5,0.75;te_serverport;" .. fgettext("Server Port") .. ";" ..
-				core.formspec_escape(current_port) .. "]"
+			retval = retval .. string.format("field[%f,%f;4.6,0.7;te_serverport;%s;%s]",
+				ix + 8.6, y, fgettext("Port"), core.formspec_escape(current_port))
 		end
-
-		retval = retval .. "container_end[]"
-	elseif world then
-		-- Big green primary button spanning the bottom of the panel.
-		retval = retval ..
-				"button[4.9,6.15;10.3,0.65;play;" .. fgettext("Play Game") .. "]"
 	end
+
+	-- Primary Play / Host button pinned to the bottom of the panel.
+	local play_label = host_mode and fgettext("Host Game")
+			or (world and fgettext("Play Game") or fgettext("Select a world"))
+	retval = retval .. string.format("button[%f,7.55;%f,0.85;play;%s]", ix, iw, play_label)
 
 	return retval
 end
@@ -245,10 +226,9 @@ local function main_button_handler(this, fields, name, tabdata)
 	assert(name == "local")
 
 	if fields.game_open_cdb then
-		local maintab = ui.find_by_name("maintab")
 		local dlg = create_contentdb_dlg("game")
-		dlg:set_parent(maintab)
-		maintab:hide()
+		dlg:set_parent(this)
+		this:hide()
 		dlg:show()
 		return true
 	end

@@ -40,6 +40,7 @@ dofile(menupath .. DIR_DELIM .. "dlg_rebind_keys.lua")
 dofile(menupath .. DIR_DELIM .. "dlg_clients_list.lua")
 dofile(menupath .. DIR_DELIM .. "dlg_server_list_mods.lua")
 dofile(menupath .. DIR_DELIM .. "dlg_home.lua")
+dofile(menupath .. DIR_DELIM .. "dlg_play.lua")
 
 local tabs = {
 	content  = dofile(menupath .. DIR_DELIM .. "tab_content.lua"),
@@ -48,24 +49,6 @@ local tabs = {
 	friends = dofile(menupath .. DIR_DELIM .. "tab_friends.lua"),
 	play_online = dofile(menupath .. DIR_DELIM .. "tab_online.lua")
 }
-
--- On the Play screen, Esc / the top-right button returns to the home screen
--- rather than quitting the game.
-local function go_home()
-	local home = ui.find_by_name("home")
-	local play = ui.find_by_name("maintab")
-	if play then play:hide() end
-	if home then home:show() end
-	ui.update()
-	return true
-end
-
-local function main_event_handler(tabview, event)
-	if event == "MenuQuit" then
-		return go_home()
-	end
-	return false
-end
 
 local function init_globals()
 	-- Permanent warning if on an unoptimized debug build
@@ -110,40 +93,20 @@ local function init_globals()
 	mm_game_theme.init()
 	mm_game_theme.set_engine() -- This is just a fallback.
 
-	-- The "Play" screen: a tabview holding Worlds / Friends / Servers.
-	-- It starts hidden; the home screen shows it when Play is pressed.
-	local tv_play = tabview_create("maintab", {x = MAIN_TAB_W, y = MAIN_TAB_H}, {x = 0, y = 0})
-
-	tv_play:set_autosave_tab(true)
-	tv_play:add(tabs.local_game)    -- Worlds
-	tv_play:add(tabs.friends)       -- Friends (placeholder for now)
-	-- "Servers": AkititoCraft's own server list (join by IP). The public
-	-- Luanti server list is disabled in serverlistmgr.
-	tv_play:add(tabs.play_online)
-
-	tv_play:set_global_event_handler(main_event_handler)
-	tv_play:set_fixed_size(false)
-
-	local last_tab = core.settings:get("maintab_LAST")
-	if last_tab and tv_play.current_tab ~= last_tab then
-		tv_play:set_tab(last_tab)
-	end
-
-	-- Top-right button on the Play screen returns to the home menu.
-	tv_play:set_end_button({
-		icon = defaulttexturedir .. "exit_btn.png",
-		label = fgettext("Back to menu"),
-		name = "back_home",
-		on_click = function()
-			return go_home()
-		end,
+	-- The custom "Play" screen: a framed menu with a Worlds / Friends /
+	-- Servers sidebar. It starts hidden; the home screen shows it on Play.
+	local play = create_play_dlg({
+		worlds  = tabs.local_game,
+		friends = tabs.friends,
+		servers = tabs.play_online,
 	})
 
 	-- The home / landing screen. This is the default UI shown at startup.
 	local home = create_home_dlg({
 		on_play = function(this)
+			play.data.active = "worlds"
 			this:hide()
-			tv_play:show()
+			play:show()
 			ui.update()
 		end,
 		on_settings = function(this)

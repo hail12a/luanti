@@ -96,7 +96,7 @@ local function fetch()
 
 		if update_detector.get_count() > 0 then
 			local maintab = ui.find_by_name("maintab")
-			if not maintab.hidden then
+			if maintab and not maintab.hidden then
 				ui.update()
 			end
 		end

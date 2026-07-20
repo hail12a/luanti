@@ -77,8 +77,10 @@ function mm_game_theme.set_game(gamedetails)
 	mm_game_theme.clear_single("footer")
 	core.set_clouds(false)
 
-	mm_game_theme.set_game_single("header", gamedetails)
-	mm_game_theme.set_game_single("footer", gamedetails)
+	-- AkititoCraft: always show our own header/footer logo, never the
+	-- bundled game's (which would say "Mineclonia").
+	mm_game_theme.set_engine_single("header")
+	mm_game_theme.set_engine_single("footer")
 
 	local c = COLORS[core.settings:get("menu_theme")]
 	if not c then

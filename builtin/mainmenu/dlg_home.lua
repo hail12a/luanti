@@ -12,10 +12,10 @@ local function esc(t)
 	return core.formspec_escape(defaulttexturedir .. t)
 end
 
--- Geometry shared with the tabview so the home screen sits in the exact
--- same on-screen rectangle as the Worlds / Servers screens.
-local CONTENT_W = MAIN_TAB_W          -- 15.5
-local CONTENT_H = MAIN_TAB_H          -- 7.1
+-- Geometry: kept in sync with the Play frame (dlg_play) so the home screen
+-- sits in the same, large on-screen rectangle.
+local CONTENT_W = 18.5
+local CONTENT_H = 8.8
 local TOUCH_GUI = false               -- resolved per-build below
 
 local function home_formspec()
@@ -34,7 +34,8 @@ local function home_formspec()
 	local version = core.get_version and core.get_version().string or ""
 
 	-- Centred button column.
-	local bw, bx = 7.0, (CONTENT_W - 7.0) / 2      -- x = 4.25
+	local bw = 9.5
+	local bx = (CONTENT_W - bw) / 2            -- x = 4.5
 
 	local fs = {
 		("formspec_version[6]size[%f,%f,false]"):format(CONTENT_W, total_h),
@@ -44,14 +45,14 @@ local function home_formspec()
 
 		-- Backdrop + soft card behind the buttons.
 		("box[0,0;%f,%f;#0000008C]"):format(CONTENT_W, CONTENT_H),
-		"box[3.85,2.25;7.8,4.6;#101f33cc]",
-		"box[3.85,2.25;7.8,0.06;#1e88e5]",
+		("box[%f,2.6;%f,5.7;#101f33cc]"):format(bx - 0.85, bw + 1.7),
+		("box[%f,2.6;%f,0.07;#1e88e5]"):format(bx - 0.85, bw + 1.7),
 
 		-- Title + subtitle (styled text; no logo art needed).
-		("hypertext[0,0.45;%f,1.25;h_title;"):format(CONTENT_W) ..
-			"<global valign=middle halign=center size=44 color=#FFFFFF><b>AkititoCraft</b>]",
-		("hypertext[0,1.7;%f,0.5;h_sub;"):format(CONTENT_W) ..
-			"<global valign=middle halign=center size=15 color=#9fb3c8>Minecraft-style survival \194\183 hosted worlds \194\183 crossplay]",
+		("hypertext[0,0.5;%f,1.4;h_title;"):format(CONTENT_W) ..
+			"<global valign=middle halign=center size=50 color=#FFFFFF><b>AkititoCraft</b>]",
+		("hypertext[0,2.0;%f,0.5;h_sub;"):format(CONTENT_W) ..
+			"<global valign=middle halign=center size=16 color=#9fb3c8>Minecraft-style survival \194\183 hosted worlds \194\183 crossplay]",
 
 		-- Button skin (9-sliced textures).
 		("style_type[button;border=false;font=bold;textcolor=#ffffff;bgimg=%s;bgimg_hovered=%s;bgimg_pressed=%s;bgimg_middle=8]")
@@ -61,19 +62,20 @@ local function home_formspec()
 		("style[btn_shop;border=false;font=bold;textcolor=#8a97a5;bgimg=%s;bgimg_hovered=%s;bgimg_pressed=%s;bgimg_middle=8]")
 			:format(btn, btn, btn),
 
-		("button[%f,2.55;%f,1.05;btn_play;%s]"):format(bx, bw, fgettext("Play")),
-		("button[%f,3.80;%f,0.85;btn_settings;%s]"):format(bx, bw, fgettext("Settings")),
-		("button[%f,4.80;%f,0.85;btn_shop;%s]"):format(bx, bw, fgettext("Shop")),
+		("button[%f,2.95;%f,1.2;btn_play;%s]"):format(bx, bw, fgettext("Play")),
+		("button[%f,4.35;%f,1.0;btn_settings;%s]"):format(bx, bw, fgettext("Settings")),
+		("button[%f,5.5;%f,1.0;btn_shop;%s]"):format(bx, bw, fgettext("Shop")),
 		-- "Coming soon" badge pinned to the right of the Shop button.
-		"hypertext[9.55,4.98;1.85,0.5;h_soon;<global valign=middle halign=center size=12 color=#ffd54f><b>COMING SOON</b>]",
-		("button[%f,5.95;%f,0.85;btn_quit;%s]"):format(bx, bw, fgettext("Quit")),
+		("hypertext[%f,5.72;2.2,0.55;h_soon;<global valign=middle halign=center size=13 color=#ffd54f><b>COMING SOON</b>]")
+			:format(bx + bw - 2.4),
+		("button[%f,6.8;%f,1.0;btn_quit;%s]"):format(bx, bw, fgettext("Quit")),
 
 		-- Footer: About (left) + version (right).
 		"style[btn_about;border=false;bgimg=" .. btn .. ";bgimg_hovered=" .. btn_h ..
 			";bgimg_pressed=" .. btn_p .. ";bgimg_middle=8;textcolor=#cfd8dc]",
-		("button[0.35,6.25;2.3,0.65;btn_about;%s]"):format(fgettext("About")),
-		("hypertext[9.5,6.35;5.65,0.6;h_ver;"):format() ..
-			"<global valign=middle halign=right size=12 color=#7f8c99>" ..
+		("button[0.4,7.9;2.6,0.75;btn_about;%s]"):format(fgettext("About")),
+		("hypertext[%f,7.95;5.5,0.6;h_ver;"):format(CONTENT_W - 5.9) ..
+			"<global valign=middle halign=right size=13 color=#7f8c99>" ..
 			core.formspec_escape(version) .. "]",
 
 		"set_focus[btn_play;true]",

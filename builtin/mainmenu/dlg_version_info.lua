@@ -112,9 +112,9 @@ local function get_current_version_code()
 end
 
 local function on_version_info_received(json)
-	local maintab = ui.find_by_name("maintab")
-	if maintab.hidden then
-		-- Another dialog is open, abort.
+	local maintab = ui.find_by_name("home")
+	if not maintab or maintab.hidden then
+		-- Home screen isn't the active screen, abort.
 		return
 	end
 
