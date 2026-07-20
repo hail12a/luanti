@@ -270,9 +270,17 @@ function menu_worldmt_legacy(selected)
 end
 
 function confirmation_formspec(message, confirm_id, confirm_label, cancel_id, cancel_label)
-	return "size[10,2.5,true]" ..
-			"label[0.5,0.5;" .. message .. "]" ..
-			"style[" .. confirm_id .. ";bgcolor=red]" ..
-			"button[0.5,1.5;2.5,0.5;" .. confirm_id .. ";" .. confirm_label .. "]" ..
-			"button[7.0,1.5;2.5,0.5;" .. cancel_id .. ";" .. cancel_label .. "]"
+	local dir = core.get_texturepath_share() .. DIR_DELIM .. "base" .. DIR_DELIM .. "pack" .. DIR_DELIM
+	local btn   = core.formspec_escape(dir .. "akititocraft_btn.png")
+	local btn_h = core.formspec_escape(dir .. "akititocraft_btn_hover.png")
+	local btn_p = core.formspec_escape(dir .. "akititocraft_btn_press.png")
+	return "formspec_version[6]size[10.5,4]" ..
+			"box[0.4,0.4;9.7,3.2;#0e1a2ef2]" ..
+			"box[0.4,0.4;9.7,0.12;#e74c3c]" ..
+			("style_type[button;border=false;font=bold;textcolor=#ffffff;bgimg=%s;bgimg_hovered=%s;bgimg_pressed=%s;bgimg_middle=8]")
+				:format(btn, btn_h, btn_p) ..
+			"textarea[0.7,0.9;9.1,1.6;;;" .. message .. "]" ..
+			"style[" .. confirm_id .. ";textcolor=#ff6b6b]" ..
+			"button[0.8,2.7;4,0.8;" .. confirm_id .. ";" .. confirm_label .. "]" ..
+			"button[5.7,2.7;4,0.8;" .. cancel_id .. ";" .. cancel_label .. "]"
 end
