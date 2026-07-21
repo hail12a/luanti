@@ -80,6 +80,9 @@ AppDir
 
 ## Configuration/log files
 minetest.conf
+# but DO track the bundled game's config (physics, game rules) — without this
+# exception it was excluded from builds and the engine defaults were used.
+!/games/mineclonia/minetest.conf
 debug.txt
 debug.txt.1
 
