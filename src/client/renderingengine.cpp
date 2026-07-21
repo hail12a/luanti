@@ -4,6 +4,8 @@
 // Copyright (C) 2017 nerzhul, Loic Blot <loic.blot@unix-experience.fr>
 
 #include <optional>
+#include <string>
+#include <algorithm>
 #include <irrlicht.h>
 #include "IMeshCache.h"
 #include "fontengine.h"
@@ -300,20 +302,22 @@ void RenderingEngine::draw_load_screen(const std::wstring &text,
 {
 	v2u32 screensize = getWindowSize();
 
-	v2s32 textsize(g_fontengine->getTextWidth(text), g_fontengine->getLineHeight());
-	v2s32 center(screensize.X / 2, screensize.Y / 2);
-	core::rect<s32> textrect(center - textsize / 2, center + textsize / 2);
-
-	gui::IGUIStaticText *guitext =
-			gui::StaticText::add(guienv, text, textrect, false, false);
-	guitext->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_UPPERLEFT);
-
 	auto *driver = get_video_driver();
 
 	driver->setFog(m_menu_sky_color);
 	driver->beginScene(true, true, m_menu_sky_color);
 
-	if (g_settings->getBool("menu_clouds")) {
+	// AkititoCraft: draw a full-screen background scene behind the loading
+	// screen (Flight-Simulator style) instead of a flat colour. Falls back to
+	// the animated menu clouds if the image is missing.
+	video::ITexture *bg_img = tsrc->getTexture("menu_background.png");
+	if (bg_img) {
+		draw2DImageFilterScaled(driver, bg_img,
+				core::rect<s32>(0, 0, screensize.X, screensize.Y),
+				core::rect<s32>(0, 0, bg_img->getSize().Width,
+						bg_img->getSize().Height),
+				0, 0, true);
+	} else if (g_settings->getBool("menu_clouds")) {
 		g_menuclouds->step(dtime * 3);
 		g_menucloudsmgr->drawAll();
 	}
@@ -325,47 +329,56 @@ void RenderingEngine::draw_load_screen(const std::wstring &text,
 		percent_max = std::min((int) *indef_pos, 100);
 		percent_min = std::max((int) *indef_pos - 40, 0);
 	}
-	// draw progress bar
+
+	// A thin progress bar spanning most of the width near the bottom.
+	float density = g_settings->getFloat("gui_scaling", 0.5f, 20.0f) *
+			getDisplayDensity();
+	u32 margin = std::max<u32>(24, (u32)(48 * density));
+	u32 barH = std::max<u32>(6, (u32)(10 * density));
+	u32 barW = (screensize.X > margin * 2) ? screensize.X - margin * 2 : screensize.X;
+	u32 barX = (screensize.X - barW) / 2;
+	u32 barY = (screensize.Y > margin + barH) ? screensize.Y - margin - barH : 0;
+
 	if ((percent_min >= 0) && (percent_max <= 100)) {
 		video::ITexture *progress_img = tsrc->getTexture("progress_bar.png");
 		video::ITexture *progress_img_bg =
 				tsrc->getTexture("progress_bar_bg.png");
 
 		if (progress_img && progress_img_bg) {
-#ifndef __ANDROID__
-			const core::dimension2d<u32> &img_size =
-					progress_img_bg->getSize();
-			float density = g_settings->getFloat("gui_scaling", 0.5f, 20.0f) *
-					getDisplayDensity();
-			u32 imgW = rangelim(img_size.Width, 200, 600) * density;
-			u32 imgH = rangelim(img_size.Height, 24, 72) * density;
-#else
-			const core::dimension2d<u32> img_size(256, 48);
-			float imgRatio = (float)img_size.Height / img_size.Width;
-			u32 imgW = screensize.X / 2.2f;
-			u32 imgH = floor(imgW * imgRatio);
-#endif
-			v2s32 img_pos((screensize.X - imgW) / 2,
-					(screensize.Y - imgH) / 2);
+			const core::dimension2d<u32> &img_size = progress_img_bg->getSize();
 
-			draw2DImageFilterScaled(get_video_driver(), progress_img_bg,
-					core::rect<s32>(img_pos.X, img_pos.Y,
-							img_pos.X + imgW,
-							img_pos.Y + imgH),
-					core::rect<s32>(0, 0, img_size.Width,
-							img_size.Height),
+			draw2DImageFilterScaled(driver, progress_img_bg,
+					core::rect<s32>(barX, barY, barX + barW, barY + barH),
+					core::rect<s32>(0, 0, img_size.Width, img_size.Height),
 					0, 0, true);
 
-			draw2DImageFilterScaled(get_video_driver(), progress_img,
-					core::rect<s32>(img_pos.X + (percent_min * imgW) / 100, img_pos.Y,
-							img_pos.X + (percent_max * imgW) / 100,
-							img_pos.Y + imgH),
+			draw2DImageFilterScaled(driver, progress_img,
+					core::rect<s32>(barX + (percent_min * barW) / 100, barY,
+							barX + (percent_max * barW) / 100, barY + barH),
 					core::rect<s32>(percent_min * img_size.Width / 100, 0,
 							percent_max * img_size.Width / 100,
 							img_size.Height),
 					0, 0, true);
 		}
 	}
+
+	// Loading text at the bottom-left, above the bar, prefixed with the
+	// percentage ("49% - Loading ..."), like a modern game loader.
+	std::wstring line = text;
+	if (!indef_pos && percent >= 0 && percent <= 100)
+		line = std::to_wstring(percent) + L"% - " + text;
+
+	u32 line_h = g_fontengine->getLineHeight();
+	s32 text_y = (s32)barY - (s32)line_h - (s32)(8 * density);
+	if (text_y < 0)
+		text_y = 0;
+	core::rect<s32> textrect(barX, text_y,
+			barX + barW, text_y + line_h);
+
+	gui::IGUIStaticText *guitext =
+			gui::StaticText::add(guienv, line.c_str(), textrect, false, false);
+	guitext->setTextAlignment(gui::EGUIA_UPPERLEFT, gui::EGUIA_UPPERLEFT);
+	guitext->setOverrideColor(video::SColor(255, 255, 255, 255));
 
 	guienv->drawAll();
 	driver->endScene();
